@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ grievance.title }}</h2>
+    <p><strong>Description:</strong> {{ grievance.description }}</p>
+    <p><strong>Urgency:</strong> {{ grievance.urgency }}</p>
+    <p><strong>Location:</strong> {{ grievance.latitude }}, {{ grievance.longitude }}</p>
+    <p><strong>Submitted on:</strong> {{ grievance.created_at }}</p>
+</div>
+{% endblock %}

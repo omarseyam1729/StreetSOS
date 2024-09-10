@@ -4,14 +4,24 @@ from .models import Grievance, UserGrievance
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import DetailView
 
 class GrievanceListView(ListView):
     model = Grievance
     template_name = 'grievances/grievance_list.html'
     context_object_name = 'grievances'
     paginate_by = 10
+
     def get_queryset(self):
         return Grievance.objects.all().order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            user_profile = self.request.user.userprofile
+            saved_grievances = UserGrievance.objects.filter(user=user_profile).values_list('grievance_id', flat=True)
+            context['saved_grievance_ids'] = list(saved_grievances)
+        return context
 
 class GrievanceCreateView(LoginRequiredMixin, CreateView):
     model = Grievance
@@ -22,9 +32,47 @@ class GrievanceCreateView(LoginRequiredMixin, CreateView):
         form.instance.user_profile = self.request.user.userprofile  # Set the user profile automatically
         return super().form_valid(form)
 
+from django.http import JsonResponse
+
 def save_grievance(request, grievance_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Not authenticated'}, status=403)
+
     grievance = get_object_or_404(Grievance, id=grievance_id)
     user_profile = request.user.userprofile
     user_grievance, created = UserGrievance.objects.get_or_create(user=user_profile, grievance=grievance)
 
-    return redirect('grievance-list')
+    if not created:
+        return JsonResponse({'error': 'Already saved'}, status=400)
+
+    return JsonResponse({'saved': True})
+
+def delete_grievance(request, grievance_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Not authenticated'}, status=403)
+
+    grievance = get_object_or_404(Grievance, id=grievance_id)
+    user_profile = request.user.userprofile
+
+    try:
+        user_grievance = UserGrievance.objects.get(user=user_profile, grievance=grievance)
+        user_grievance.delete()
+        return JsonResponse({'deleted': True})
+    except UserGrievance.DoesNotExist:
+        return JsonResponse({'error': 'Grievance not saved by user'}, status=404)
+
+
+class SavedGrievancesListView(LoginRequiredMixin, ListView):
+    model = UserGrievance
+    template_name = 'grievances/saved_grievances_list.html'
+    context_object_name = 'saved_grievances'
+    paginate_by = 10
+    def get_queryset(self):
+        return UserGrievance.objects.filter(user=self.request.user.userprofile).order_by('-saved_at')
+
+class GrievanceDetailView(DetailView):
+    model = Grievance
+    template_name = 'grievances/grievance_detail.html'
+    context_object_name = 'grievance'
+from django.http import JsonResponse
+

@@ -11,9 +11,15 @@
         <p>Submitted on: {{ grievance.created_at }}</p>
 
         {% if user.is_authenticated %}
-        <form method="POST" action="{% url 'grievance-save' grievance.id %}">
+        <form id="grievance-form-{{ grievance.id }}" method="POST" action="{% if grievance.id in saved_grievance_ids %}/delete/{{ grievance.id }}/{% else %}/save/{{ grievance.id }}/{% endif %}" class="grievance-form">
             {% csrf_token %}
-            <button type="submit">Save Grievance</button>
+            <button type="button" class="grievance-button" data-grievance-id="{{ grievance.id }}" data-saved="{% if grievance.id in saved_grievance_ids %}true{% else %}false{% endif %}">
+                {% if grievance.id in saved_grievance_ids %}
+                    Unsave Grievance
+                {% else %}
+                    Save Grievance
+                {% endif %}
+            </button>
         </form>
         {% endif %}
     </li>
@@ -39,4 +45,51 @@
         </span>
     </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.grievance-button');
+
+    buttons.forEach(button => {
+        button.addEventListener('click', function () {
+            const grievanceId = this.dataset.grievanceId;
+            const form = document.getElementById('grievance-form-' + grievanceId);
+            const csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]').value;
+            const actionUrl = form.action;
+            const isSaved = this.getAttribute('data-saved') === 'true';
+
+            // Send AJAX request to save or unsave
+            fetch(actionUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    grievance_id: grievanceId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Check if the grievance was saved or deleted and update button text accordingly
+                if (data.saved) {
+                    this.textContent = 'Unsave Grievance';
+                    form.action = '/delete/' + grievanceId + '/'; // Update form action for unsaving
+                    this.setAttribute('data-saved', 'true');
+                } else if (data.deleted) {
+                    this.textContent = 'Save Grievance';
+                    form.action = '/save/' + grievanceId + '/'; // Update form action for saving
+                    this.setAttribute('data-saved', 'false');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Optionally, show an error message to the user
+            });
+        });
+    });
+});
+</script>
 {% endblock %}

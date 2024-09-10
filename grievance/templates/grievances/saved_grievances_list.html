@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Saved Grievances</h2>
+    <ul>
+        {% for saved_grievance in saved_grievances %}
+            <li>
+                <a href="{% url 'grievance-detail' saved_grievance.grievance.id %}">
+                    {{ saved_grievance.grievance.title }} (Urgency: {{ saved_grievance.grievance.urgency }})
+                </a>
+                <p>Saved on: {{ saved_grievance.saved_at }}</p>
+            </li>
+        {% empty %}
+            <p>No saved grievances yet.</p>
+        {% endfor %}
+    </ul>
+
+    <!-- Pagination controls -->
+    {% if is_paginated %}
+        <div class="pagination">
+            <span class="step-links">
+                {% if saved_grievances.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ saved_grievances.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ saved_grievances.number }} of {{ saved_grievances.paginator.num_pages }}.
+                </span>
+
+                {% if saved_grievances.has_next %}
+                    <a href="?page={{ saved_grievances.next_page_number }}">next</a>
+                    <a href="?page={{ saved_grievances.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+{% endblock %}
