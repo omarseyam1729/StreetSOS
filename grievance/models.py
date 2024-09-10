@@ -12,12 +12,10 @@ class Grievance(models.Model):
     def __str__(self):
         return f"{self.title} (Urgency: {self.urgency})"
 
-
 class UserGrievance(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)  # Link to User
     grievance = models.ForeignKey(Grievance, on_delete=models.CASCADE)  # Link to Grievance
     saved_at = models.DateTimeField(auto_now_add=True)  # When was the grievance saved
-
     class Meta:
         unique_together = ('user', 'grievance')  # Prevents the same user from saving the same grievance multiple times
 
