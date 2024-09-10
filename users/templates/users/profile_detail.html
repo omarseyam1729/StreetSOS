@@ -1,8 +1,16 @@
 {% extends 'base.html' %}
 
+{% load static %}  <!-- Ensure the static tag is loaded -->
+
 {% block content %}
 <h2>{{ profile.user.username }}'s Profile</h2>
-<img src="{{ profile.profile_picture.url }}" alt="Profile Picture" width="150">
+
+{% if profile.profile_picture %}
+    <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" width="150">
+{% else %}
+    <img src="{% static 'images/default_profile_picture.png' %}" alt="Default Profile Picture" width="150">
+{% endif %}
+
 <p><strong>Bio:</strong> {{ profile.bio }}</p>
 <p><strong>Karma:</strong> {{ profile.karma }}</p>
 <a href="{% url 'profile-edit' %}">Edit Profile</a>

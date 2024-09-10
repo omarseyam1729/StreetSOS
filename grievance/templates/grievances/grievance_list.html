@@ -9,10 +9,13 @@
         <p>{{ grievance.description }}</p>
         <p>Location: {{ grievance.latitude }}, {{ grievance.longitude }}</p>
         <p>Submitted on: {{ grievance.created_at }}</p>
+
+        {% if user.is_authenticated %}
         <form method="POST" action="{% url 'grievance-save' grievance.id %}">
             {% csrf_token %}
             <button type="submit">Save Grievance</button>
         </form>
+        {% endif %}
     </li>
     {% endfor %}
 </ul>

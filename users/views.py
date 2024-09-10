@@ -14,7 +14,11 @@ class UserProfileDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'profile'
 
     def get_object(self):
-        return UserProfile.objects.get(user=self.request.user)
+        # Try to get the UserProfile, if it doesn't exist, create it
+        user = self.request.user
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
+        return user_profile
+
 
 class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = UserProfile
@@ -23,7 +27,12 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('profile-detail')
 
     def get_object(self):
-        return UserProfile.objects.get(user=self.request.user)
+        # Try to get the UserProfile, if it doesn't exist, create it
+        try:
+            return UserProfile.objects.get(user=self.request.user)
+        except UserProfile.DoesNotExist:
+            return UserProfile.objects.create(user=self.request.user)
+
 
 # Login View
 class CustomLoginView(LoginView):
