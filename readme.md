@@ -1,0 +1,1 @@
+A basic CRUD application in Django with templates.
