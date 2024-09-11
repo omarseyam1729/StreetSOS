@@ -1,10 +1,90 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Submit a Grievance</h2>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
-</form>
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Submit a Grievance</h2>
+    
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="POST" id="grievanceForm" class="p-4">
+                {% csrf_token %}
+                
+                {{ form.as_p }}  <!-- This will render the form with Bootstrap classes applied -->
+
+                <!-- Map for Selecting Location -->
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label">Location</label>
+                    <div class="col-sm-9">
+                        <div id="map" style="height: 400px;" class="rounded mb-3"></div>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="mb-3 row">
+                    <div class="col-sm-9 offset-sm-3">
+                        <button type="submit" class="btn btn-primary w-100">Submit Grievance</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Load Google Maps JavaScript API -->
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&callback=initMap" async defer></script>
+
+<script>
+let marker;  // Declare marker globally
+
+function initMap() {
+    // Set default location for map
+    var mapOptions = {
+        center: { lat: -25.344, lng: 131.036 },  // Default location (Uluru, Australia)
+        zoom: 4,
+    };
+    
+    var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    
+    // Initialize marker at the center
+    marker = new google.maps.Marker({
+        position: mapOptions.center,
+        map: map,
+        draggable: true  // Allow marker to be draggable
+    });
+    
+    // Update marker position on map click
+    google.maps.event.addListener(map, 'click', function(event) {
+        var clickedLocation = event.latLng;
+        marker.setPosition(clickedLocation);  // Move marker to clicked position
+    });
+}
+
+// Handle form submission and append latitude/longitude from the map
+document.getElementById('grievanceForm').addEventListener('submit', function(event) {
+    var markerPosition = marker.getPosition();  // Get marker position
+    var latitude = markerPosition.lat();
+    var longitude = markerPosition.lng();
+
+    // Create and append hidden input fields for latitude and longitude
+    var form = event.target;
+
+    // Create latitude input
+    var latitudeInput = document.createElement('input');
+    latitudeInput.type = 'hidden';
+    latitudeInput.name = 'latitude';
+    latitudeInput.value = latitude;
+    form.appendChild(latitudeInput);
+
+    // Create longitude input
+    var longitudeInput = document.createElement('input');
+    longitudeInput.type = 'hidden';
+    longitudeInput.name = 'longitude';
+    longitudeInput.value = longitude;
+    form.appendChild(longitudeInput);
+
+    // Allow the form to submit normally
+});
+</script>
 {% endblock %}

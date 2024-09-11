@@ -23,14 +23,31 @@ class GrievanceListView(ListView):
             context['saved_grievance_ids'] = list(saved_grievances)
         return context
 
+
+
 class GrievanceCreateView(LoginRequiredMixin, CreateView):
     model = Grievance
     template_name = 'grievances/grievance_form.html'
     fields = ['title', 'description', 'urgency', 'latitude', 'longitude']
     success_url = reverse_lazy('grievance-list')
+
+    def get_form(self):
+        """
+        Override the default form to add Bootstrap classes to the fields.
+        """
+        form = super().get_form()
+        form.fields['title'].widget.attrs.update({'class': 'form-control'})
+        form.fields['description'].widget.attrs.update({'class': 'form-control'})
+        form.fields['urgency'].widget.attrs.update({'class': 'form-select'})  # Use form-select for dropdowns in Bootstrap
+        form.fields['latitude'].widget.attrs.update({'class': 'form-control', 'readonly': 'readonly'})
+        form.fields['longitude'].widget.attrs.update({'class': 'form-control', 'readonly': 'readonly'})
+        return form
+
     def form_valid(self, form):
-        form.instance.user_profile = self.request.user.userprofile  # Set the user profile automatically
+        # Set the user profile for the grievance before saving
+        form.instance.user_profile = self.request.user.userprofile
         return super().form_valid(form)
+
 
 
 def save_grievance(request, grievance_id):

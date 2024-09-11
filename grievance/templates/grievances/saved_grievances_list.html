@@ -1,38 +1,96 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Saved Grievances</h2>
-    <ul>
-        {% for saved_grievance in saved_grievances %}
-            <li>
-                <a href="{% url 'grievance-detail' saved_grievance.grievance.id %}">
-                    {{ saved_grievance.grievance.title }} (Urgency: {{ saved_grievance.grievance.urgency }})
-                </a>
-                <p>Saved on: {{ saved_grievance.saved_at }}</p>
-            </li>
-        {% empty %}
-            <p>No saved grievances yet.</p>
-        {% endfor %}
-    </ul>
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Saved Grievances</h2>
 
+    <!-- List of Saved Grievances -->
+    {% if saved_grievances %}
+    <div class="row">
+        {% for saved_grievance in saved_grievances %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'grievance-detail' saved_grievance.grievance.id %}" class="text-decoration-none text-dark">
+                            {{ saved_grievance.grievance.title }} 
+                        </a>
+                        <span class="badge bg-danger ms-2">Urgency: {{ saved_grievance.grievance.urgency }}</span>
+                    </h5>
+                    <p class="card-text">
+                        Submitted by: <strong>{{ saved_grievance.grievance.user_profile.user.username }}</strong><br>
+                        On: {{ saved_grievance.grievance.created_at|date:"M d, Y" }}
+                    </p>
+
+                    <!-- Interactive Map -->
+                    <div id="map-{{ forloop.counter }}" style="height: 200px;" class="rounded mb-3"></div>
+                    
+                    <p class="text-muted">Saved on: {{ saved_grievance.saved_at|date:"M d, Y" }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center text-muted">No saved grievances yet.</p>
+    {% endif %}
+    
     <!-- Pagination controls -->
     {% if is_paginated %}
-        <div class="pagination">
-            <span class="step-links">
-                {% if saved_grievances.has_previous %}
-                    <a href="?page=1">&laquo; first</a>
-                    <a href="?page={{ saved_grievances.previous_page_number }}">previous</a>
-                {% endif %}
-
-                <span class="current">
-                    Page {{ saved_grievances.number }} of {{ saved_grievances.paginator.num_pages }}.
-                </span>
-
-                {% if saved_grievances.has_next %}
-                    <a href="?page={{ saved_grievances.next_page_number }}">next</a>
-                    <a href="?page={{ saved_grievances.paginator.num_pages }}">last &raquo;</a>
-                {% endif %}
-            </span>
-        </div>
+    <nav aria-label="Page navigation" class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            {% if saved_grievances.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1" aria-label="First">
+                    <span aria-hidden="true">&laquo; First</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ saved_grievances.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo; Previous</span>
+                </a>
+            </li>
+            {% endif %}
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ saved_grievances.number }} of {{ saved_grievances.paginator.num_pages }}</span>
+            </li>
+            {% if saved_grievances.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ saved_grievances.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">Next &raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ saved_grievances.paginator.num_pages }}" aria-label="Last">
+                    <span aria-hidden="true">Last &raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
     {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Load Google Maps JavaScript API -->
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&callback=initMaps" async defer></script>
+
+<script>
+// Initialize maps for each grievance
+function initMaps() {
+    {% for saved_grievance in saved_grievances %}
+        var location = { lat: parseFloat({{ saved_grievance.grievance.latitude }}), lng: parseFloat({{ saved_grievance.grievance.longitude }}) };
+        var map = new google.maps.Map(document.getElementById('map-{{ forloop.counter }}'), {
+            zoom: 15,
+            center: location,
+        });
+        var marker = new google.maps.Marker({
+            position: location,
+            map: map,
+            title: '{{ saved_grievance.grievance.title }}'
+        });
+    {% endfor %}
+}
+</script>
 {% endblock %}

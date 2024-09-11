@@ -1,54 +1,99 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Grievances</h2>
-<ul>
-    {% for grievance in grievances %}
-    <li>
-        <h3>{{ grievance.title }} (Urgency: {{ grievance.urgency }})</h3>
-        <p>{{ grievance.description }}</p>
-        <p>Location: {{ grievance.latitude }}, {{ grievance.longitude }}</p>
-        <p>Submitted on: {{ grievance.created_at }}</p>
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Grievances</h2>
+    <div class="row">
+        {% for grievance in grievances %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ grievance.title }} 
+                        <span class="badge bg-danger ms-2">Urgency: {{ grievance.urgency }}</span>
+                    </h5>
+                    <p class="card-text">{{ grievance.description|truncatewords:15 }}</p>
 
-        {% if user.is_authenticated %}
-        <form id="grievance-form-{{ grievance.id }}" method="POST" action="{% if grievance.id in saved_grievance_ids %}/delete/{{ grievance.id }}/{% else %}/save/{{ grievance.id }}/{% endif %}" class="grievance-form">
-            {% csrf_token %}
-            <button type="button" class="grievance-button" data-grievance-id="{{ grievance.id }}" data-saved="{% if grievance.id in saved_grievance_ids %}true{% else %}false{% endif %}">
-                {% if grievance.id in saved_grievance_ids %}
-                    Unsave Grievance
-                {% else %}
-                    Save Grievance
-                {% endif %}
-            </button>
-        </form>
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
+                    <!-- Interactive Map -->
+                    <div id="map-{{ forloop.counter }}" style="height: 200px;" class="rounded mb-3"></div>
 
-{% if is_paginated %}
-    <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-                <a href="?page=1">&laquo; first</a>
-                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-            {% endif %}
-
-            <span class="current">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-            </span>
-
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-            {% endif %}
-        </span>
+                    <p><small><strong>Submitted by:</strong> {{ grievance.user_profile.user.username }} on {{ grievance.created_at|date:"M d, Y" }}</small></p>
+                    
+                    {% if user.is_authenticated %}
+                    <form id="grievance-form-{{ grievance.id }}" method="POST" action="{% if grievance.id in saved_grievance_ids %}/delete/{{ grievance.id }}/{% else %}/save/{{ grievance.id }}/{% endif %}" class="grievance-form">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-warning grievance-button w-100" data-grievance-id="{{ grievance.id }}" data-saved="{% if grievance.id in saved_grievance_ids %}true{% else %}false{% endif %}">
+                            {% if grievance.id in saved_grievance_ids %}
+                                Unsave Grievance
+                            {% else %}
+                                Save Grievance
+                            {% endif %}
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-{% endif %}
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1" aria-label="First">
+                    <span aria-hidden="true">&laquo; First</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo; Previous</span>
+                </a>
+            </li>
+            {% endif %}
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">Next &raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                    <span aria-hidden="true">Last &raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
 {% endblock %}
 
 {% block extra_js %}
+<!-- Load Google Maps JavaScript API -->
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&callback=initMaps" async defer></script>
+
 <script>
+function initMaps() {
+    {% for grievance in grievances %}
+        var location = { lat: parseFloat({{ grievance.latitude }}), lng: parseFloat({{ grievance.longitude }}) };
+        var map = new google.maps.Map(document.getElementById('map-{{ forloop.counter }}'), {
+            zoom: 15,
+            center: location,
+        });
+        var marker = new google.maps.Marker({
+            position: location,
+            map: map,
+            title: '{{ grievance.title }}'
+        });
+    {% endfor %}
+}
+
+// Handle Save/Unsave functionality with AJAX
 document.addEventListener('DOMContentLoaded', function () {
     const buttons = document.querySelectorAll('.grievance-button');
 
@@ -59,6 +104,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]').value;
             const actionUrl = form.action;
             const isSaved = this.getAttribute('data-saved') === 'true';
+
+            // Add animation class to the button
+            this.classList.add('btn-loading');
 
             // Send AJAX request to save or unsave
             fetch(actionUrl, {
@@ -83,13 +131,46 @@ document.addEventListener('DOMContentLoaded', function () {
                     form.action = '/save/' + grievanceId + '/'; // Update form action for saving
                     this.setAttribute('data-saved', 'false');
                 }
+                // Remove animation class after the action is complete
+                this.classList.remove('btn-loading');
             })
             .catch(error => {
                 console.error('Error:', error);
                 // Optionally, show an error message to the user
+                this.classList.remove('btn-loading');
             });
         });
     });
 });
 </script>
+
+<style>
+    /* Add a smooth transition and loading effect */
+    .btn-loading {
+        pointer-events: none;
+        opacity: 0.6;
+        transition: all 0.3s ease;
+    }
+
+    /* Add shadow effect to the card */
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Hover effect for the cards */
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Style pagination */
+    .pagination .page-link {
+        transition: background-color 0.3s ease;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #ffc107;
+        color: #fff;
+    }
+</style>
 {% endblock %}
