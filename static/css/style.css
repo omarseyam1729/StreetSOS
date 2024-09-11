@@ -1,0 +1,268 @@
+/* General Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    transition: background-color 0.5s ease-in-out;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: #0056b3;
+}
+
+a {
+    color: #0056b3;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #003d80;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #0056b3;
+    padding: 15px 20px;
+    position: relative;
+}
+
+.navbar a {
+    color: #fff;
+    margin-right: 20px;
+    font-size: 16px;
+    transition: color 0.3s ease-in-out;
+}
+
+.navbar a:hover {
+    color: #ffcc00;
+}
+
+/* Dropdown Styles */
+.dropdown-menu {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s ease-in-out;
+}
+
+.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-menu a {
+    color: #000;  /* Black text for dropdown items */
+    padding: 10px 20px;
+    display: block;
+    text-align: left;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.dropdown-menu a:hover {
+    background-color: #f4f7f6;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    background-color: #0056b3;
+    color: #fff;
+    font-size: 16px;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease;
+    border: none;
+}
+
+.btn:hover {
+    background-color: #003d80;
+    transform: translateY(-3px); /* Hover lift effect */
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+}
+
+/* Card */
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transform: translateY(0);
+    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px); /* Hover lift effect for card */
+}
+
+.card-header {
+    background-color: #0056b3;
+    color: #fff;
+    padding: 20px;
+    font-size: 20px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Form Styles */
+form {
+    margin-top: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #0056b3;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 86, 179, 0.2);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+/* Animations for form elements */
+input, textarea, select {
+    transition: transform 0.2s ease-in-out;
+}
+
+input:hover, textarea:hover, select:hover {
+    transform: scale(1.02); /* Slight zoom on hover */
+}
+
+/* Header */
+.header {
+    background-color: #0056b3;
+    color: #fff;
+    padding: 40px 0;
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.header h1 {
+    font-size: 36px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Footer */
+.footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px;
+    font-size: 14px;
+    position: relative;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.footer a {
+    color: #ffcc00;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.3s ease-in-out;
+}
+
+th {
+    background-color: #0056b3;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #e6f3ff;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .navbar a {
+        display: block;
+        margin: 10px 0;
+    }
+
+    .btn-block {
+        width: 100%;
+    }
+}

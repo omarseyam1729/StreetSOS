@@ -1,10 +1,40 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Edit Profile</h2>
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Changes</button>
-</form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2>Edit Profile</h2>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="form-group mb-3">
+                            {{ form.profile_picture.label_tag }}
+                            {{ form.profile_picture }}
+                            <div class="form-text">Upload a profile picture (optional).</div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            {{ form.bio.label_tag }}
+                            <textarea name="bio" class="form-control" rows="4">{{ form.bio.value }}</textarea>
+                            <div class="form-text">Write a brief bio about yourself (max 300 characters).</div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            {{ form.karma.label_tag }}
+                            {{ form.karma }}
+                            <div class="form-text">Your karma points.</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-block">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

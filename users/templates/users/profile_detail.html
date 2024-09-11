@@ -3,15 +3,25 @@
 {% load static %}  <!-- Ensure the static tag is loaded -->
 
 {% block content %}
-<h2>{{ profile.user.username }}'s Profile</h2>
-
-{% if profile.profile_picture %}
-    <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" width="150">
-{% else %}
-    <img src="{% static 'images/default_profile_picture.png' %}" alt="Default Profile Picture" width="150">
-{% endif %}
-
-<p><strong>Bio:</strong> {{ profile.bio }}</p>
-<p><strong>Karma:</strong> {{ profile.karma }}</p>
-<a href="{% url 'profile-edit' %}">Edit Profile</a>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2>{{ profile.user.username }}'s Profile</h2>
+                </div>
+                <div class="card-body text-center">
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle mb-3" width="150">
+                    {% else %}
+                        <img src="{% static 'images/default_profile_picture.png' %}" alt="Default Profile Picture" class="rounded-circle mb-3" width="150">
+                    {% endif %}
+                    <p><strong>Bio:</strong> {{ profile.bio }}</p>
+                    <p><strong>Karma:</strong> {{ profile.karma }}</p>
+                    <a href="{% url 'profile-edit' %}" class="btn btn-primary mt-3">Edit Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

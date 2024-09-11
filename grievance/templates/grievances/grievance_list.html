@@ -6,32 +6,34 @@
     <div class="row">
         {% for grievance in grievances %}
         <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">{{ grievance.title }} 
-                        <span class="badge bg-danger ms-2">Urgency: {{ grievance.urgency }}</span>
-                    </h5>
-                    <p class="card-text">{{ grievance.description|truncatewords:15 }}</p>
+            <a href="{% url 'grievance-detail' grievance.id %}" class="text-decoration-none text-dark">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ grievance.title }} 
+                            <span class="badge bg-danger ms-2">Urgency: {{ grievance.urgency }}</span>
+                        </h5>
+                        <p class="card-text">{{ grievance.description|truncatewords:15 }}</p>
 
-                    <!-- Interactive Map -->
-                    <div id="map-{{ forloop.counter }}" style="height: 200px;" class="rounded mb-3"></div>
+                        <!-- Interactive Map -->
+                        <div id="map-{{ forloop.counter }}" style="height: 200px;" class="rounded mb-3"></div>
 
-                    <p><small><strong>Submitted by:</strong> {{ grievance.user_profile.user.username }} on {{ grievance.created_at|date:"M d, Y" }}</small></p>
-                    
-                    {% if user.is_authenticated %}
-                    <form id="grievance-form-{{ grievance.id }}" method="POST" action="{% if grievance.id in saved_grievance_ids %}/delete/{{ grievance.id }}/{% else %}/save/{{ grievance.id }}/{% endif %}" class="grievance-form">
-                        {% csrf_token %}
-                        <button type="button" class="btn btn-warning grievance-button w-100" data-grievance-id="{{ grievance.id }}" data-saved="{% if grievance.id in saved_grievance_ids %}true{% else %}false{% endif %}">
-                            {% if grievance.id in saved_grievance_ids %}
-                                Unsave Grievance
-                            {% else %}
-                                Save Grievance
-                            {% endif %}
-                        </button>
-                    </form>
-                    {% endif %}
+                        <p><small><strong>Submitted by:</strong> {{ grievance.user_profile.user.username }} on {{ grievance.created_at|date:"M d, Y" }}</small></p>
+                        
+                        {% if user.is_authenticated %}
+                        <form id="grievance-form-{{ grievance.id }}" method="POST" action="{% if grievance.id in saved_grievance_ids %}/delete/{{ grievance.id }}/{% else %}/save/{{ grievance.id }}/{% endif %}" class="grievance-form">
+                            {% csrf_token %}
+                            <button type="button" class="btn btn-warning grievance-button w-100" data-grievance-id="{{ grievance.id }}" data-saved="{% if grievance.id in saved_grievance_ids %}true{% else %}false{% endif %}">
+                                {% if grievance.id in saved_grievance_ids %}
+                                    Unsave Grievance
+                                {% else %}
+                                    Save Grievance
+                                {% endif %}
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
         {% endfor %}
     </div>
@@ -98,7 +100,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const buttons = document.querySelectorAll('.grievance-button');
 
     buttons.forEach(button => {
-        button.addEventListener('click', function () {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();  // Prevent navigation since the button is inside a clickable card
             const grievanceId = this.dataset.grievanceId;
             const form = document.getElementById('grievance-form-' + grievanceId);
             const csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]').value;
