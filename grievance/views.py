@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import DetailView
-
+from django.http import JsonResponse
 class GrievanceListView(ListView):
     model = Grievance
     template_name = 'grievances/grievance_list.html'
@@ -32,7 +32,6 @@ class GrievanceCreateView(LoginRequiredMixin, CreateView):
         form.instance.user_profile = self.request.user.userprofile  # Set the user profile automatically
         return super().form_valid(form)
 
-from django.http import JsonResponse
 
 def save_grievance(request, grievance_id):
     if not request.user.is_authenticated:
@@ -74,5 +73,5 @@ class GrievanceDetailView(DetailView):
     model = Grievance
     template_name = 'grievances/grievance_detail.html'
     context_object_name = 'grievance'
-from django.http import JsonResponse
+
 
