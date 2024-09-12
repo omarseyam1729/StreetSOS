@@ -67,6 +67,9 @@
                     <li class="nav-item">
                         <a class="nav-link fw-semibold" href="{% url 'saved-grievances' %}">Saved Grievances</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="{% url 'my-grievances' %}">My Grievances</a>
+                    </li> <!-- Added My Grievances link -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle fw-semibold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             {{ user.username }} <!-- Display logged-in user's username -->
@@ -91,6 +94,7 @@
                     </li>
                     {% endif %}
                 </ul>
+                
             </div>
         </div>
     </nav>

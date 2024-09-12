@@ -1,11 +1,10 @@
-from django.shortcuts import render
-from django.views.generic import ListView, CreateView
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import ListView, CreateView, DetailView
 from .models import Grievance, UserGrievance
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import DetailView
 from django.http import JsonResponse
+
 class GrievanceListView(ListView):
     model = Grievance
     template_name = 'grievances/grievance_list.html'
@@ -22,8 +21,6 @@ class GrievanceListView(ListView):
             saved_grievances = UserGrievance.objects.filter(user=user_profile).values_list('grievance_id', flat=True)
             context['saved_grievance_ids'] = list(saved_grievances)
         return context
-
-
 
 class GrievanceCreateView(LoginRequiredMixin, CreateView):
     model = Grievance
@@ -47,8 +44,6 @@ class GrievanceCreateView(LoginRequiredMixin, CreateView):
         # Set the user profile for the grievance before saving
         form.instance.user_profile = self.request.user.userprofile
         return super().form_valid(form)
-
-
 
 def save_grievance(request, grievance_id):
     if not request.user.is_authenticated:
@@ -77,12 +72,12 @@ def delete_grievance(request, grievance_id):
     except UserGrievance.DoesNotExist:
         return JsonResponse({'error': 'Grievance not saved by user'}, status=404)
 
-
 class SavedGrievancesListView(LoginRequiredMixin, ListView):
     model = UserGrievance
     template_name = 'grievances/saved_grievances_list.html'
     context_object_name = 'saved_grievances'
     paginate_by = 10
+    
     def get_queryset(self):
         return UserGrievance.objects.filter(user=self.request.user.userprofile).order_by('-saved_at')
 
@@ -91,4 +86,11 @@ class GrievanceDetailView(DetailView):
     template_name = 'grievances/grievance_detail.html'
     context_object_name = 'grievance'
 
+class MyGrievancesListView(LoginRequiredMixin, ListView):
+    model = Grievance
+    template_name = 'grievances/my_grievances_list.html'  # Update with the actual template name
+    context_object_name = 'grievances'
+    paginate_by = 10
 
+    def get_queryset(self):
+        return Grievance.objects.filter(user_profile=self.request.user.userprofile).order_by('-created_at')
