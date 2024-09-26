@@ -1,0 +1,15 @@
+ 
+# Django and core dependencies
+Django==4.2.3
+djangorestframework==3.14.0  # Only include if using DRF
+
+# WSGI server for production
+gunicorn==20.1.0
+
+# PostgreSQL database adapter (if using PostgreSQL)
+psycopg2-binary==2.9.6
+
+# Static file serving for production
+whitenoise==6.4.0
+
+# Any other dependencies for your project
