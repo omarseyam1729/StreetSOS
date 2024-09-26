@@ -19,7 +19,7 @@ pipeline {
                 script {
                     echo 'Setting up virtual environment and installing dependencies...'
                     sh 'python3 -m venv venv'
-                    sh '. venv/bin/activate && pip install -r requirements.txt'
+                    sh '. venv/bin/activate && pip3 install -r requirements.txt'
 
                     // Debugging: List installed packages
                     echo 'Listing installed packages...'
