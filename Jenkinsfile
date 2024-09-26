@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
+    // Skip the default automatic SCM checkout
     options {
-        // Clean the workspace before checking out code
-        cleanBeforeCheckout()
+        skipDefaultCheckout(true)
     }
 
     environment {
@@ -11,6 +11,25 @@ pipeline {
     }
 
     stages {
+        // Stage to clean workspace and checkout code
+        stage('Clean and Checkout') {
+            steps {
+                // Clean the workspace
+                cleanWs()
+
+                // Checkout the code from SCM
+                checkout scm
+            }
+        }
+
+        // Optional: Verify that files are present
+        stage('Verify Files') {
+            steps {
+                echo 'Listing files in Jenkins workspace after checkout...'
+                sh 'ls -la'
+            }
+        }
+
         // Build Stage
         stage('Build') {
             steps {
@@ -32,7 +51,7 @@ pipeline {
             }
         }
 
-        // Continue with other stages...
+        // Continue with other stages (Deploy, Release, Monitoring)...
     }
 
     post {
