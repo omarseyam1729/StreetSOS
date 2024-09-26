@@ -13,3 +13,4 @@ psycopg2-binary==2.9.6
 whitenoise==6.4.0
 
 # Any other dependencies for your project
+python-decouple==3.8  # or the latest version
