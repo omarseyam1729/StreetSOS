@@ -15,4 +15,7 @@ whitenoise==6.4.0
 python-decouple==3.8  # or the latest version
 
 # Image processing (required for Django ImageField)
-Pillow==10.0.1  # Add Pillow for handling images in ImageField
+Pillow==10.0.1
+
+# Code style and quality checking
+flake8==6.1.0  # Add Flake8 for linting
