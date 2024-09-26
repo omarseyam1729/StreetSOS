@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GOOGLE_MAPS_API_KEY = credentials('google-maps-api-key')
+        GOOGLE_MAPS_API_KEY = credentials('GOOGLE_MAPS_API_KEY')
     }
 
     stages {
