@@ -1,4 +1,3 @@
- 
 # Django and core dependencies
 Django==4.2.3
 djangorestframework==3.14.0  # Only include if using DRF
@@ -12,5 +11,8 @@ psycopg2-binary==2.9.6
 # Static file serving for production
 whitenoise==6.4.0
 
-# Any other dependencies for your project
+# Environment variable management
 python-decouple==3.8  # or the latest version
+
+# Image processing (required for Django ImageField)
+Pillow==10.0.1  # Add Pillow for handling images in ImageField
