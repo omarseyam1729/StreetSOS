@@ -55,19 +55,20 @@ pipeline {
             steps {
                 script {
                     echo 'Deploying application to AWS EC2 instance...'
-                    sshagent(['37ceb940-2e7b-4639-8ce6-19e988e124f4']) {
-                        sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@3.25.122.97<< EOF
-                        cd StreetSOS
-                        git pull origin main
-                        source venv/bin/activate
-                        pip install -r requirements.txt
-                        python manage.py migrate
-                        python manage.py collectstatic --noinput
-                        sudo systemctl restart gunicorn
-                        EOF
-                        '''
-                    }
+                withCredentials([sshUserPrivateKey(credentialsId: 'ubuntu-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+                sh """
+                ssh -o StrictHostKeyChecking=no -i \$SSH_KEY \$SSH_USER@3.25.171.134 << EOF
+                cd /path/to/your/django/project/StreetSOS
+                git pull origin main
+                source venv/bin/activate
+                pip install -r requirements.txt
+                python manage.py migrate
+                python manage.py collectstatic --noinput
+                sudo systemctl restart gunicorn
+                EOF
+                """
+        }
+
                 }
             }
         }
