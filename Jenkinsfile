@@ -57,7 +57,7 @@ pipeline {
                     echo 'Deploying application to AWS EC2 instance...'
                     sshagent(['37ceb940-2e7b-4639-8ce6-19e988e124f4']) {
                         sh '''
-                        ssh -o StrictHostKeyChecking=no ec2-user@<your-ec2-ip> << EOF
+                        ssh -o StrictHostKeyChecking=no ubuntu@3.25.122.97<< EOF
                         cd StreetSOS
                         git pull origin main
                         source venv/bin/activate
