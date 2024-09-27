@@ -55,7 +55,7 @@ pipeline {
             steps {
                 script {
                     echo 'Deploying application to AWS EC2 instance...'
-                withCredentials([sshUserPrivateKey(credentialsId: 'ubuntu', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: '37ceb940-2e7b-4639-8ce6-19e988e124f4', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
                 sh """
                 ssh -o StrictHostKeyChecking=no -i \$SSH_KEY \$SSH_USER@3.25.171.134 << EOF
                 cd /path/to/your/django/project/StreetSOS
