@@ -55,7 +55,7 @@ pipeline {
             steps {
                 script {
                     echo 'Deploying application to AWS EC2 instance...'
-                    sshagent(['ubuntu']) {
+                    sshagent(['37ceb940-2e7b-4639-8ce6-19e988e124f4']) {
                         sh '''
                         ssh -o StrictHostKeyChecking=no ec2-user@<your-ec2-ip> << EOF
                         cd StreetSOS
